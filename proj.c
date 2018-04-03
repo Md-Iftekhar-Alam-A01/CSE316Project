@@ -107,16 +107,30 @@ void assignProcessInQueue(int n, struct process proc[]) {
 
 
 void printQueueFront() {
-	printf("%d\n",queue1Front().processId) ;
-	printf("%d\n",queue2Front().processId) ;
-	printf("%d\n",queue3Front().processId) ;
+//	printf("Queue 1 1st -> P%d\n",queue1Front().processId) ;
+//	printf("Queue 2 1st -> P%d\n",queue2Front().processId) ;
+//	printf("Queue 3 1st -> P%d\n",queue3Front().processId) ;
+	int i ;
+	printf("Process in Queue 1 - ") ;
+	for(i=0;i<=rear1;i++) {
+		printf("P%d  ",queue1[i].processId) ;
+	}
+	printf("\nProcess in Queue 2 - ") ;
+	for(i=0;i<=rear2;i++) {
+		printf("P%d  ",queue2[i].processId) ;
+	}
+	printf("\nProcess in Queue 3 - ") ;
+	for(i=0;i<=rear3;i++) {
+		printf("P%d  ",queue3[i].processId) ;
+	}
+	printf("\n") ;
 }
 
 
 void roundRobin(int n, struct process proc[]) {
 	int i,j,time,remain=n,flag=0,timeQuantum = 4,waitTime=0,turnAroundTime=0 ;
 	
-	printf("\n\nProcess\t|Turnaround Time|Waiting Time\n\n"); 
+	printf("\n\nProcess\t\tWaiting Time    Turnaround Time\n\n"); 
   	for(time=0,i=0;remain!=0;) {  	 
 	    if((proc[i].responseTime<=timeQuantum) && (proc[i].responseTime)>0) { 
 			time+=(proc[i].responseTime); 
@@ -127,7 +141,7 @@ void roundRobin(int n, struct process proc[]) {
 			time+=timeQuantum; 
 	    } if((proc[i].responseTime)==0 && flag==1) { 
 		    remain--; 
-			printf("P[%d]\t|\t%d\t|\t%d\n",i+1,time-(proc[i].arrivalTime),time-((proc[i].arrivalTime)-(proc[i].burstTime))); 
+			printf("Process[%d]\t\t%d\t\t%d\n",proc[i].processId,time-((proc[i].arrivalTime)-(proc[i].burstTime)),time-(proc[i].arrivalTime)); 
 		    waitTime+=time-(proc[i].arrivalTime)-(proc[i].burstTime); 
 			turnAroundTime+=time-(proc[i].arrivalTime); 
 		    flag=0; 
@@ -138,19 +152,60 @@ void roundRobin(int n, struct process proc[]) {
 	    else 
 	    	i=0; 
 	} 
-	printf("\nAverage Waiting Time= %f\n",waitTime*1.0/n); 
-	printf("Avg Turnaround Time = %f",turnAroundTime*1.0/n); 
+	//printf("\nAverage Waiting Time= %f\n",waitTime*1.0/n); 
+	//printf("Avg Turnaround Time = %f",turnAroundTime*1.0/n); 
 }
+
+
+void fcfs(int n, struct process proc[]) {
+		float waiting_time[30], turnaround_time[30];
+        float average_waiting_time = 0.0, average_turnaround_time = 0.0;
+        int count, j, total_process=n;
+        waiting_time[0] = 0;   
+        for(count = 1; count < total_process; count++)
+        {
+                waiting_time[count] = 0;
+                for(j = 0; j < count; j++)
+                {
+                        waiting_time[count] = waiting_time[count] + proc[j].burstTime ;
+                }
+        }
+        printf("\nProcess\t\tWaiting Time\tTurnaround Time\n");
+        for(count = 0; count < total_process; count++)
+        {
+                turnaround_time[count] = proc[count].burstTime + waiting_time[count];
+                average_waiting_time = average_waiting_time + waiting_time[count];
+                average_turnaround_time = average_turnaround_time + turnaround_time[count];
+                printf("\nProcess [%d]\t\t%.2f\t\t%.2f", proc[count].processId, waiting_time[count], turnaround_time[count]);
+        }
+        printf("\n");
+        average_waiting_time = average_waiting_time / count;
+        average_turnaround_time = average_turnaround_time / count;
+//        printf("\nAverage Waiting Time = %f", average_waiting_time);
+//        printf("\nAverage Turnaround Time = %f", average_turnaround_time);
+//        printf("\n");
+        
+}
+
+
+void queueScheduling1() {
+	roundRobin(rear1+1, queue1) ;
+}
+void queueScheduling3() {
+	fcfs(rear3+1, queue3) ;
+}
+
 
 int main() {
 	int n ;
-	printf("How many process") ;
+	printf("How many process - ") ;
 	scanf("%d",&n) ;
 	struct process proc[n] ;
 	createProcess(n, proc) ;
 	assignProcessInQueue(n, proc) ;
 	printQueueFront() ;
-	roundRobin(n, proc) ;
+	queueScheduling1() ;
+	queueScheduling3() ;
 //	int i ;
 //	for(i = 0; i<n;i++) {
 //		
